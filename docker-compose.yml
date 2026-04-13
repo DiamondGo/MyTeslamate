@@ -1,0 +1,60 @@
+services:
+  teslamate:
+    image: teslamate/teslamate:latest
+    restart: always
+    environment:
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASS=${DATABASE_PASS}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_HOST=database
+      - MQTT_HOST=mosquitto
+      - MQTT_NAMESPACE=teslamate
+      # 轮询间隔配置（秒）- 减少延迟但会增加电池消耗
+      # - POLLING_ONLINE_INTERVAL=15  # 默认60秒，改为15秒（更快但耗电）
+    ports:
+      - 4000:4000
+    volumes:
+      - ./import:/opt/app/import
+    cap_drop:
+      - all
+
+  database:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - teslamate-db:/var/lib/postgresql/data
+
+  grafana:
+    image: teslamate/grafana:latest
+    restart: always
+    environment:
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASS=${DATABASE_PASS}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_HOST=database
+      - TZ=America/Vancouver
+    ports:
+      - 3000:3000
+    volumes:
+      - teslamate-grafana-data:/var/lib/grafana
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: always
+    command: mosquitto -c /mosquitto-no-auth.conf
+    ports:
+      - 1883:1883
+    volumes:
+      - mosquitto-conf:/mosquitto/config
+      - mosquitto-data:/mosquitto/data
+
+volumes:
+  teslamate-db:
+  teslamate-grafana-data:
+  mosquitto-conf:
+  mosquitto-data:

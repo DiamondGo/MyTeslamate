@@ -1,0 +1,37 @@
+# Secrets — never commit real credentials
+.env
+
+# Tesla OAuth token cache (contains real access/refresh tokens)
+cache.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env.local
+
+# Local teslapy binary/copy (installed via pip instead)
+teslapy
+teslapy/
+
+# General cache
+*.cache
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

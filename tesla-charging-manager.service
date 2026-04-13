@@ -1,0 +1,16 @@
+[Unit]
+Description=Tesla Charging Accessory Power Manager
+After=network.target mosquitto.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=ken
+WorkingDirectory=/home/ken/source/teslaAutomate
+ExecStart=/home/ken/source/teslaAutomate/venv/bin/python3 /home/ken/source/teslaAutomate/charging_accessory_manager.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
