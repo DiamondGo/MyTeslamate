@@ -13,6 +13,7 @@ monitor_temp.py – 监控 Tesla 温度变化事件示例
 
 import time
 from tesla import TeslaMQTTClient, TeslaEvent, EventType
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID, MQTT_NAMESPACE
 
 
 # ---------------------------------------------------------------------------
@@ -34,10 +35,10 @@ def example_simple():
         )
 
     client = TeslaMQTTClient(
-        broker="localhost",
-        port=1883,
-        car_id=1,
-        namespace="teslamate",
+        broker=MQTT_BROKER,
+        port=MQTT_PORT,
+        car_id=CAR_ID,
+        namespace=MQTT_NAMESPACE,
     )
     client.on(EventType.INSIDE_TEMP,  on_temp)   # 车内温度
     client.on(EventType.OUTSIDE_TEMP, on_temp)   # 车外温度
@@ -68,7 +69,7 @@ def example_climate_group():
             f"{event.old_value!r:15} → {event.new_value!r}"
         )
 
-    client = TeslaMQTTClient()
+    client = TeslaMQTTClient(broker=MQTT_BROKER, port=MQTT_PORT, car_id=CAR_ID, namespace=MQTT_NAMESPACE)
     # on_climate_change 覆盖 EventType.climate_events() 中的全部 10 个事件：
     # INSIDE_TEMP, OUTSIDE_TEMP, IS_CLIMATE_ON, IS_PRECONDITIONING,
     # CLIMATE_KEEPER_MODE, DRIVER_TEMP_SETTING, PASSENGER_TEMP_SETTING,
@@ -97,7 +98,7 @@ class TempMonitor:
     """封装温度监控逻辑的示例类。"""
 
     def __init__(self):
-        self.client = TeslaMQTTClient()
+        self.client = TeslaMQTTClient(broker=MQTT_BROKER, port=MQTT_PORT, car_id=CAR_ID, namespace=MQTT_NAMESPACE)
         # 注册感兴趣的事件
         self.client.on(EventType.INSIDE_TEMP,   self._on_inside_temp)
         self.client.on(EventType.OUTSIDE_TEMP,  self._on_outside_temp)

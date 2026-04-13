@@ -9,10 +9,7 @@ import paho.mqtt.client as mqtt
 import sys
 from datetime import datetime
 
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1
-MQTT_NAMESPACE = "teslamate"
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID, MQTT_NAMESPACE
 
 # 存储之前的值，用于检测变化
 previous_values = {}

@@ -9,10 +9,7 @@ import paho.mqtt.client as mqtt
 import time
 import sys
 
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1
-MQTT_NAMESPACE = "teslamate"  # 从 docker-compose.yml 中的 MQTT_NAMESPACE，默认前缀即为 "teslamate"
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID, MQTT_NAMESPACE
 
 # 存储接收到的消息
 messages = {}

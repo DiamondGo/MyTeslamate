@@ -22,6 +22,7 @@ logging.basicConfig(
 )
 
 from tesla import TeslaMQTTClient, TeslaEvent, EventType
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID, MQTT_NAMESPACE
 
 # ---------------------------------------------------------------------------
 # Callback definitions
@@ -87,14 +88,14 @@ def main() -> None:
     print("=" * 70)
     print("  Tesla MQTT Demo")
     print("=" * 70)
-    print("  Connecting to localhost:1883 …")
+    print(f"  Connecting to {MQTT_BROKER}:{MQTT_PORT} …")
     print()
 
     client = TeslaMQTTClient(
-        broker="localhost",
-        port=1883,
-        car_id=1,
-        namespace="teslamate",
+        broker=MQTT_BROKER,
+        port=MQTT_PORT,
+        car_id=CAR_ID,
+        namespace=MQTT_NAMESPACE,
         client_id="tesla_demo",
         emit_unchanged=False,   # only fire callbacks when value actually changes
     )

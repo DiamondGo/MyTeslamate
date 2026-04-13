@@ -11,10 +11,7 @@ import paho.mqtt.client as mqtt
 import time
 import sys
 
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1
-TESLAMATE_URL = "http://localhost:4000"
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID, TESLAMATE_URL
 
 # 存储接收到的消息
 messages = {}

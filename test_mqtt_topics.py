@@ -9,9 +9,7 @@ import paho.mqtt.client as mqtt
 import sys
 import time
 
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID
 
 
 def on_connect(client, userdata, flags, reason_code, properties):

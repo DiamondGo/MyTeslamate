@@ -1,6 +1,9 @@
 # Secrets — never commit real credentials
 .env
 
+# Local config (copy of config.example.py with real values)
+config.py
+
 # Tesla OAuth token cache (contains real access/refresh tokens)
 cache.json
 

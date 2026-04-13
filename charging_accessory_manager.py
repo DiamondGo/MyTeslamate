@@ -14,10 +14,7 @@ import sys
 import time
 import threading
 
-# 配置
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1  # TeslaMate中的车辆ID，默认为1，如果有多辆车请修改
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID
 
 # MQTT主题
 TOPIC_PLUGGED_IN = f"teslamate/cars/{CAR_ID}/plugged_in"

@@ -9,9 +9,7 @@ import paho.mqtt.client as mqtt
 import time
 import sys
 
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID
 
 # MQTT主题
 TOPIC_PLUGGED_IN = f"teslamate/cars/{CAR_ID}/plugged_in"

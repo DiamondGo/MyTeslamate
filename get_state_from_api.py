@@ -7,8 +7,7 @@ import requests
 import json
 import sys
 
-TESLAMATE_URL = "http://localhost:4000"
-CAR_ID = 1
+from config import TESLAMATE_URL, CAR_ID
 
 def get_car_state():
     """从TeslaMate API获取车辆状态"""

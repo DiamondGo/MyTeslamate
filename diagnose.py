@@ -8,9 +8,7 @@ import time
 import sys
 from datetime import datetime
 
-MQTT_BROKER = "localhost"
-MQTT_PORT = 1883
-CAR_ID = 1
+from config import MQTT_BROKER, MQTT_PORT, CAR_ID
 
 received_messages = {}
 last_update_time = {}
