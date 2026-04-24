@@ -1,8 +1,15 @@
+# Private directory contents (keep the directory itself via private/.gitkeep)
+private/*
+!private/.gitkeep
+
 # Secrets — never commit real credentials
 .env
 
 # Local config (copy of config.example.py with real values)
 config.py
+
+# User's active rules (copy of rules.example.yaml with personal rules)
+rules.yaml
 
 # Tesla OAuth token cache (contains real access/refresh tokens)
 cache.json
@@ -31,6 +38,11 @@ teslapy/
 
 # General cache
 *.cache
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
 
 # macOS
 .DS_Store

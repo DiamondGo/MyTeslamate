@@ -9,6 +9,9 @@ import paho.mqtt.client as mqtt
 import time
 import sys
 
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import MQTT_BROKER, MQTT_PORT, CAR_ID, MQTT_NAMESPACE
 
 # 存储接收到的消息

@@ -238,6 +238,13 @@ class TeslaState:
     """True when rear-right tyre pressure is below soft-warning threshold."""
 
     # ------------------------------------------------------------------ #
+    # Geofence
+    # ------------------------------------------------------------------ #
+    geofence: Optional[str] = None
+    """TeslaMate geofence name the vehicle is currently inside (e.g. 'Home', 'Work').
+    None when the vehicle is not inside any configured geofence."""
+
+    # ------------------------------------------------------------------ #
     # Active route / navigation
     # ------------------------------------------------------------------ #
     active_route: Optional[str] = None
@@ -302,6 +309,26 @@ class TeslaState:
     # ------------------------------------------------------------------ #
     updated_at: Optional[datetime] = field(default=None, repr=False)
     """Wall-clock time of the most recent field update."""
+
+    # ------------------------------------------------------------------ #
+    # Convenience query helpers
+    # ------------------------------------------------------------------ #
+
+    def is_at_home(self) -> bool:
+        """Return True when the vehicle is inside the 'Home' geofence.
+
+        TeslaMate publishes the geofence name on the ``geofence`` topic.
+        Returns False when the geofence is unknown / not yet received.
+        """
+        return self.geofence == "Home"
+
+    def is_parked(self) -> bool:
+        """Return True when the vehicle is parked (shift_state is 'P' or None).
+
+        TeslaMate omits the shift_state topic (None) when the vehicle is
+        parked/off, and publishes 'P' when the gear selector is in Park.
+        """
+        return self.shift_state in (None, "P")
 
     # ------------------------------------------------------------------ #
     # Helpers

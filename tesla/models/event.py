@@ -143,6 +143,11 @@ class EventType(str, Enum):
     TPMS_SOFT_WARNING_RR = "tpms_soft_warning_rr"
 
     # ------------------------------------------------------------------ #
+    # Geofence
+    # ------------------------------------------------------------------ #
+    GEOFENCE = "geofence"
+
+    # ------------------------------------------------------------------ #
     # Active route / navigation
     # ------------------------------------------------------------------ #
     ACTIVE_ROUTE = "active_route"
@@ -285,6 +290,7 @@ class EventType(str, Enum):
             cls.ELEVATION,
             cls.ODOMETER,
             cls.SHIFT_STATE,
+            cls.GEOFENCE,
         })
 
     @classmethod

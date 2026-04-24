@@ -1,0 +1,229 @@
+# Tesla Automation Rules – Example Configuration
+#
+# Copy this file to rules.yaml and customise it for your needs.
+# rules.yaml is gitignored so your personal rules stay private.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Rule structure
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# rules:
+#   - name: "unique_rule_name"          # Required. Used in logs and cooldown tracking.
+#     description: "What this rule does" # Optional human-readable description.
+#     enabled: true                      # Optional. Set to false to disable without deleting.
+#     cooldown_seconds: 300              # Optional. Min seconds between executions (default 300).
+#     trigger_on:                        # Optional. Only evaluate when these events arrive.
+#       - EVENT_TYPE_NAME                # EventType enum names (see tesla/models/event.py).
+#     conditions:                        # Required. ALL must be true for the rule to fire.
+#       - field: state_field_name        # TeslaState field name (see tesla/models/state.py).
+#         operator: eq                   # Operator: eq, ne, gt, gte, lt, lte, in, not_in,
+#         value: some_value              #           is_none, not_none
+#     actions:                           # Required. Executed in order when all conditions met.
+#       - command: controller_method     # TeslaController method name.
+#         params:                        # Optional keyword arguments for the method.
+#           param_name: param_value
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Supported operators
+# ─────────────────────────────────────────────────────────────────────────────
+#   eq        – field == value
+#   ne        – field != value
+#   gt        – field >  value   (numeric)
+#   gte       – field >= value   (numeric)
+#   lt        – field <  value   (numeric)
+#   lte       – field <= value   (numeric)
+#   in        – field in [list]
+#   not_in    – field not in [list]
+#   is_none   – field is None    (value key not needed)
+#   not_none  – field is not None (value key not needed)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Supported commands (TeslaController methods)
+# ─────────────────────────────────────────────────────────────────────────────
+#   start_climate          – Turn on HVAC
+#   stop_climate           – Turn off HVAC
+#   set_temperature        – params: driver_temp (float), passenger_temp (float, optional)
+#   start_climate_keeper   – params: mode ("on" | "dog" | "camp")
+#   start_charging         – Start charging
+#   stop_charging          – Stop charging
+#   set_charge_limit       – params: percent (int, 0-100)
+#   open_charge_port       – Open charge port door
+#   close_charge_port      – Close charge port door
+#   lock                   – Lock doors
+#   unlock                 – Unlock doors
+#   enable_sentry_mode     – Enable Sentry Mode
+#   disable_sentry_mode    – Disable Sentry Mode
+#   vent_windows           – Vent all windows
+#   close_windows          – Close all windows
+#   set_accessory_power    – params: on (true | false)
+#   wake_up                – Wake vehicle from sleep
+#   execute_command        – params: command (str), plus any extra params
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Common TeslaState fields for conditions
+# ─────────────────────────────────────────────────────────────────────────────
+#   plugged_in             – bool: true when charge cable is connected
+#   charging_state         – str: "Charging", "Complete", "Disconnected", "Stopped"
+#   battery_level          – int: 0-100 (%)
+#   inside_temp            – float: cabin temperature in °C
+#   outside_temp           – float: ambient temperature in °C
+#   is_climate_on          – bool: true when HVAC is active
+#   geofence               – str: TeslaMate geofence name, e.g. "Home", "Work"
+#   state                  – str: "online", "asleep", "offline", "charging"
+#   shift_state            – str: "P", "D", "R", "N", or null when parked/off
+#   locked                 – bool: true when doors are locked
+#   sentry_mode            – bool: true when Sentry Mode is active
+#   keep_accessory_power_on – bool: true when accessory power is on
+#   is_user_present        – bool: true when driver is detected
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+rules:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Use case 1: High cabin temperature cooling
+  #
+  # Scenario: The car is plugged in (so it has power) and the cabin
+  # temperature rises above 40 °C (e.g. parked in the sun).
+  # Action: Start the HVAC and set a comfortable temperature.
+  #
+  # Cooldown: 10 minutes (600s) to avoid hammering the API if the
+  # temperature fluctuates around the threshold.
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "high_temp_cooling"
+    description: >
+      When the car is plugged in and the cabin temperature exceeds 40 °C,
+      start the climate system and set it to 22 °C to ventilate and cool down.
+    enabled: true
+    cooldown_seconds: 600
+    trigger_on:
+      - INSIDE_TEMP
+      - PLUGGED_IN
+    conditions:
+      - field: plugged_in
+        operator: eq
+        value: true
+      - field: inside_temp
+        operator: gt
+        value: 40.0
+      - field: is_climate_on
+        operator: eq
+        value: false
+    actions:
+      - command: start_climate
+      - command: set_temperature
+        params:
+          driver_temp: 22.0
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Use case 2: Home charging – enable accessory power
+  #
+  # Scenario: The car is plugged in AND is inside the "Home" geofence
+  # (parked at home). Enable "Keep Accessory Power On" so that 12V
+  # accessories (dashcam, etc.) remain powered while charging.
+  #
+  # Cooldown: 5 minutes (300s).
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "home_charging_accessory_power"
+    description: >
+      When the car is plugged in at Home, enable accessory power so that
+      12V accessories remain powered during the charging session.
+    enabled: true
+    cooldown_seconds: 300
+    trigger_on:
+      - PLUGGED_IN
+      - GEOFENCE
+    conditions:
+      - field: plugged_in
+        operator: eq
+        value: true
+      - field: geofence
+        operator: eq
+        value: "Home"
+      - field: keep_accessory_power_on
+        operator: eq
+        value: false
+    actions:
+      - command: set_accessory_power
+        params:
+          on: true
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Use case 3: Restore accessory power when unplugged at Home
+  #
+  # Scenario: The car is unplugged while still at Home.
+  # Action: Disable accessory power to avoid draining the 12V battery.
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "home_unplug_disable_accessory_power"
+    description: >
+      When the car is unplugged at Home, disable accessory power to
+      prevent 12V battery drain while parked without charging.
+    enabled: true
+    cooldown_seconds: 300
+    trigger_on:
+      - PLUGGED_IN
+    conditions:
+      - field: plugged_in
+        operator: eq
+        value: false
+      - field: geofence
+        operator: eq
+        value: "Home"
+      - field: keep_accessory_power_on
+        operator: eq
+        value: true
+    actions:
+      - command: set_accessory_power
+        params:
+          on: false
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Example: Low battery alert + start charging
+  # (disabled by default – enable and customise as needed)
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "low_battery_start_charging"
+    description: >
+      When the battery drops below 20% and the car is plugged in but not
+      charging, start charging immediately.
+    enabled: false
+    cooldown_seconds: 1800
+    trigger_on:
+      - BATTERY_LEVEL
+      - CHARGING_STATE
+    conditions:
+      - field: battery_level
+        operator: lt
+        value: 20
+      - field: plugged_in
+        operator: eq
+        value: true
+      - field: charging_state
+        operator: in
+        value: ["Stopped", "Disconnected"]
+    actions:
+      - command: start_charging
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Example: Enable Sentry Mode when leaving Home
+  # (disabled by default – enable and customise as needed)
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "enable_sentry_away_from_home"
+    description: >
+      When the car is not at Home and not moving (parked), enable Sentry Mode.
+    enabled: false
+    cooldown_seconds: 600
+    trigger_on:
+      - GEOFENCE
+      - SHIFT_STATE
+    conditions:
+      - field: geofence
+        operator: ne
+        value: "Home"
+      - field: shift_state
+        operator: in
+        value: ["P", null]
+      - field: sentry_mode
+        operator: eq
+        value: false
+    actions:
+      - command: enable_sentry_mode

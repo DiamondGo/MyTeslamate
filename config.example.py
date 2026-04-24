@@ -1,22 +1,28 @@
 """
-配置文件示例
+Configuration file example.
 
-使用方法：
-1. 复制此文件为 config.py
-2. 根据您的实际情况修改配置
+Usage:
+1. Copy this file to config.py
+2. Fill in your actual values
+3. config.py is gitignored – never commit real credentials
 """
 
-# MQTT服务器配置
-MQTT_BROKER = "localhost"   # MQTT broker 地址（mosquitto 容器所在主机）
-MQTT_PORT = 1883            # MQTT broker 端口
+# ── MQTT (TeslaMate / Mosquitto) ─────────────────────────────────────────── #
+MQTT_BROKER = "localhost"       # Mosquitto broker hostname or IP
+MQTT_PORT = 1883                # Mosquitto broker TCP port
 
-# TeslaMate Web 地址
-TESLAMATE_URL = "http://localhost:4000"
+# ── TeslaMate ────────────────────────────────────────────────────────────── #
+TESLAMATE_URL = "http://localhost:4000"   # TeslaMate web UI URL
 
-# TeslaMate配置
-CAR_ID = 1          # 您的车辆ID，默认为1
-                    # 如果您有多辆车，可以在TeslaMate的MQTT主题中找到对应的ID
-MQTT_NAMESPACE = "teslamate"  # docker-compose.yml 中 MQTT_NAMESPACE 的值
+CAR_ID = 1                      # TeslaMate vehicle ID (default 1)
+                                 # Find it in TeslaMate's MQTT topics if you
+                                 # have multiple vehicles.
+MQTT_NAMESPACE = "teslamate"    # Must match MQTT_NAMESPACE in docker-compose.yml
 
-# 日志级别 (DEBUG, INFO, WARNING, ERROR)
-LOG_LEVEL = "INFO"
+# ── Tesla Fleet API (for the Control module) ─────────────────────────────── #
+TESLA_EMAIL = "your-email@example.com"
+# The OAuth token is cached automatically in private/cache.json after the
+# first successful login via script/get_token.py.
+
+# ── Logging ──────────────────────────────────────────────────────────────── #
+LOG_LEVEL = "INFO"              # DEBUG | INFO | WARNING | ERROR
